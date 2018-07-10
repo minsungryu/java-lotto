@@ -1,6 +1,6 @@
 package lotto.util;
 
-public class PositiveNumber {
+public class PositiveNumber extends Number {
 
     private int number;
 
@@ -15,7 +15,23 @@ public class PositiveNumber {
         this(Integer.parseInt(input));
     }
 
-    public int toInt() {
+    @Override
+    public int intValue() {
+        return this.number;
+    }
+
+    @Override
+    public long longValue() {
+        return this.number;
+    }
+
+    @Override
+    public float floatValue() {
+        return this.number;
+    }
+
+    @Override
+    public double doubleValue() {
         return this.number;
     }
 

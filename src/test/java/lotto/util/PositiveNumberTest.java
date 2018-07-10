@@ -1,6 +1,5 @@
 package lotto.util;
 
-import lotto.util.PositiveNumber;
 import org.junit.Test;
 
 public class PositiveNumberTest {

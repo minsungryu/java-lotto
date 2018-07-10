@@ -1,7 +1,9 @@
 package lotto.domain;
 
-import lotto.dto.LottoDTO;
+import lotto.dto.GameResult;
+import lotto.dto.LottoList;
 import lotto.generator.RandomLottoGenerator;
+import lotto.util.RateDouble;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -10,77 +12,89 @@ public class LottoGame {
 
     private static final int LOTTO_PRICE = 1000;
 
-    LottoDTO lottoDTO;
+    private LottoList lottoList;
+    private int money;
 
     public LottoGame() {
-        lottoDTO = new LottoDTO();
+        this.lottoList = new LottoList();
+        this.money = 0;
     }
 
     public void setMoney(int money) {
-        lottoDTO.setMoney(money);
+        this.money = money;
     }
 
-    public int buyMaximumLottos() {
-        int lottoAmount = lottoDTO.getMoney() / LOTTO_PRICE;
-        for (int i = 0; i < lottoAmount; i++) {
-            buyLotto();
-        }
-        return lottoAmount;
+    public void setWinLotto(WinLotto winLotto) {
+        lottoList.setWinLotto(winLotto);
+    }
+
+    public boolean hasEnoughMoney() {
+        return LOTTO_PRICE <= money;
     }
 
     public void buyLotto() {
-        lottoDTO.add(Lotto.of(new RandomLottoGenerator()));
+        buyLotto(new RandomLottoGenerator().toString());
     }
 
     public void buyLotto(String numbers) {
-        lottoDTO.add(Lotto.of(numbers));
-    }
-
-    public void setWinLotto(Lotto winLotto) {
-        lottoDTO.setWinLotto(winLotto);
-    }
-
-    public void calculateTotalPrize() {
-        Lotto winLotto = lottoDTO.getWinLotto();
-
-        int sum = 0;
-        for (Lotto lotto : lottoDTO.getLottoList()) {
-            int matchCount = lotto.match(winLotto);
-            sum += Rank.prizeOf(matchCount);
+        if (!hasEnoughMoney()) {
+            throw new RuntimeException();
         }
-
-        lottoDTO.setTotalPrize(sum);
+        lottoList.addLotto(Lotto.of(numbers));
+        money -= LOTTO_PRICE;
     }
 
-    public void makeStatistics() {
+    public Map<Rank, Integer> getStatistics() {
         Map<Rank, Integer> statisticsMap = initStatisticsMap();
 
-        Lotto winLotto = lottoDTO.getWinLotto();
-        for (Lotto lotto : lottoDTO.getLottoList()) {
-            int matchCount = lotto.match(winLotto);
-            Rank rank = Rank.of(matchCount);
+        WinLotto winLotto = lottoList.getWinLotto();
+        for (Lotto lotto : lottoList.getLottoList()) {
+            int matchCount = winLotto.match(lotto);
+            boolean bonusMatch = winLotto.bonusMatch(lotto);
+            Rank rank = Rank.of(matchCount, bonusMatch);
             statisticsMap.put(rank, statisticsMap.get(rank) + 1);
         }
 
-        lottoDTO.setStatistics(statisticsMap);
+        return statisticsMap;
     }
 
-    private Map<Rank, Integer> initStatisticsMap() {
+    public Map<Rank, Integer> initStatisticsMap() {
         Map<Rank, Integer> statisticsMap = new TreeMap<>();
-        for (int i = 0; i < Rank.WIN_MAX; i++) {
-            statisticsMap.put(Rank.of(i), 0);
+        for (Rank rank : Rank.values()) {
+            statisticsMap.put(rank, 0);
         }
         return statisticsMap;
     }
 
-    public void calculateEarningRate() {
-        int investMoney = lottoDTO.getMoney();
-        int totalPrize = lottoDTO.getTotalPrize();
-        lottoDTO.setEarningRate(String.format("%.1f", ((double) totalPrize / investMoney) * 100));
+    public RateDouble getEarningRate() {
+        int investMoney = getInvestMoney();
+        int totalPrize = getTotalPrize();
+        return new RateDouble((double) totalPrize * 100 / investMoney);
     }
 
-    public LottoDTO getLottoDTO() {
-        return lottoDTO;
+    public int getInvestMoney() {
+        return lottoList.getLottoList().size() * LOTTO_PRICE;
+    }
+
+    public int getTotalPrize() {
+        WinLotto winLotto = lottoList.getWinLotto();
+
+        int totalPrize = 0;
+        for (Lotto lotto : lottoList.getLottoList()) {
+            int matchCount = winLotto.match(lotto);
+            boolean bonusMatch = winLotto.bonusMatch(lotto);
+            totalPrize += Rank.prizeOf(matchCount, bonusMatch);
+        }
+
+        return totalPrize;
+    }
+
+    public LottoList getLottoList() {
+        return lottoList;
+    }
+
+    public GameResult getGameResult() {
+        return new GameResult(getStatistics(), getEarningRate());
     }
 
 }

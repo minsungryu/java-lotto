@@ -21,4 +21,10 @@ public class RandomLottoGenerator implements LottoGenerator {
         return new TreeSet<>(lottoNumber.subList(0, 6));
     }
 
+    @Override
+    public String toString() {
+        String generated = generate().toString();
+        return generated.substring(1, generated.length() - 1);
+    }
+
 }

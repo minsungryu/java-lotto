@@ -1,28 +1,15 @@
-import lotto.domain.Lotto;
+import lotto.controller.LottoGameController;
 import lotto.domain.LottoGame;
-import lotto.view.InputView;
-import lotto.view.ResultView;
+import lotto.view.LottoConsoleView;
 
 public class Main {
 
     public static void main(String[] args) {
-        InputView inputView = new InputView();
-        int money = inputView.getMoney();
+        LottoGameController controller = new LottoGameController();
+        controller.setView(new LottoConsoleView());
+        controller.setGame(new LottoGame());
 
-        LottoGame lottoGame = new LottoGame();
-        lottoGame.setMoney(money);
-        lottoGame.buyMaximumLottos();
-
-        ResultView resultView = new ResultView(lottoGame.getLottoDTO());
-        resultView.printLottoList();
-
-        String winNumbers = inputView.getWinNumbers();
-        lottoGame.setWinLotto(Lotto.of(winNumbers));
-        lottoGame.makeStatistics();
-        lottoGame.calculateEarningRate();
-
-        resultView.printStatistics();
-        resultView.printRate();
+        controller.run();
     }
 
 }

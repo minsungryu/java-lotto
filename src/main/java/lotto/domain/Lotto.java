@@ -46,7 +46,7 @@ public class Lotto {
         return matchCount;
     }
 
-    private boolean contains(LottoNumber lottoNumber) {
+    public boolean contains(LottoNumber lottoNumber) {
         return lottoNumbers.contains(lottoNumber);
     }
 
