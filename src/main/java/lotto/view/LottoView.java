@@ -13,9 +13,9 @@ public interface LottoView {
 
     String getLottoNumbers(String message);
 
-    void print(String message);
+    void print(Object message);
 
-    void println(String message);
+    void println(Object message);
 
     void printBuyLottoList(LottoList lottoList);
 

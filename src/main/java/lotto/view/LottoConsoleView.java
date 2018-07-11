@@ -9,6 +9,7 @@ import lotto.util.RateDouble;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public class LottoConsoleView implements LottoView {
@@ -47,9 +48,9 @@ public class LottoConsoleView implements LottoView {
     }
 
     @Override
-    public void print(String message) {
+    public void print(Object message) {
         try {
-            bw.write(message);
+            bw.write(String.valueOf(message));
             bw.flush();
         } catch (Exception e) {
             println(e.getMessage());
@@ -57,14 +58,15 @@ public class LottoConsoleView implements LottoView {
     }
 
     @Override
-    public void println(String message) {
-        print(message + '\n');
+    public void println(Object message) {
+        print(String.valueOf(message) + '\n');
     }
 
     @Override
     public void printBuyLottoList(LottoList lottoDTO) {
-        println(lottoDTO.getLottoList().size() + "개를 구매했습니다.");
-        for (Lotto lotto : lottoDTO.getLottoList()) {
+        List<Lotto> lottoList = lottoDTO.getLottoList();
+        println(lottoList.size() + "개를 구매했습니다.");
+        for (Lotto lotto : lottoList) {
             println(lotto.toString());
         }
     }

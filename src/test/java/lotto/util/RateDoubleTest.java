@@ -18,7 +18,8 @@ public class RateDoubleTest {
 
     @Test
     public void rateToString() {
-        assertThat(new RateDouble(3.141592).doubleValue()).isEqualTo("3.1");
+        assertThat(new RateDouble(3.141592).toString()).isEqualTo("3.1");
+        assertThat(new RateDouble(3.141592).doubleValue()).isEqualTo(3.1);
     }
 
 }

@@ -5,6 +5,7 @@ import lotto.generator.LottoGenerator;
 import lotto.util.InputParser;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Lotto {
 
@@ -25,25 +26,15 @@ public class Lotto {
     }
 
     public static Lotto of(String input) {
-        List<String> tokens = InputParser.splitByComma(input);
-        List<Integer> numbers = InputParser.toInts(tokens);
-        return Lotto.of(numbers.toArray(new Integer[numbers.size()]));
+        return Lotto.of(Arrays.stream(InputParser.splitByComma(input)).map(Integer::parseInt).toArray(Integer[]::new));
     }
 
     public static Lotto of(Integer... input) {
-        Set<LottoNumber> lottoNumbers = new TreeSet<>();
-        for (int i = 0; i < input.length; i++) {
-            lottoNumbers.add(LottoNumber.of(input[i]));
-        }
-        return new Lotto(lottoNumbers);
+        return new Lotto(Arrays.stream(input).map(LottoNumber::of).collect(Collectors.toSet()));
     }
 
     public int match(Lotto target) {
-        int matchCount = 0;
-        for (LottoNumber lottoNumber : lottoNumbers) {
-            matchCount += target.contains(lottoNumber) ? 1 : 0;
-        }
-        return matchCount;
+        return (int) lottoNumbers.stream().filter(target::contains).count();
     }
 
     public boolean contains(LottoNumber lottoNumber) {
